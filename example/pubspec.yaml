@@ -20,7 +20,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-  gradual_stepper: ^0.0.1
+  gradual_stepper:
+    path: ../
+  flutter_multi_formatter: ^1.1.6
 
 dev_dependencies:
   flutter_test:

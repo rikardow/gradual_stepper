@@ -25,10 +25,11 @@ enum StepperState { stable, shouldIncrease, shouldDecrease }
 class GradualStepper extends StatefulWidget {
   const GradualStepper({
     Key key,
-    this.initialValue = 0,
+    this.initialValue = 0.0,
+    this.displayValue = '',
     this.minimumValue,
     this.maximumValue,
-    this.stepValue = 1,
+    this.stepValue = 1.0,
     this.onChanged,
     this.locale,
     this.elevation = 0.0,
@@ -44,33 +45,35 @@ class GradualStepper extends StatefulWidget {
   })  : assert(initialValue != null),
         assert(minimumValue == null || minimumValue <= initialValue),
         assert(maximumValue == null || maximumValue >= initialValue),
-        assert(stepValue != null && stepValue > 0),
+        assert(stepValue != null && stepValue > 0.0),
         assert(elevation != null && elevation >= 0.0),
         assert(cornerRadius != null && cornerRadius >= 0.0),
         assert(counterElevation != null && counterElevation >= 0.0),
         assert(counterCornerRadius != null && counterCornerRadius >= 0.0),
         super(key: key);
 
+  final String displayValue;
+
   /// The first displaying value of the stepper.
   /// Defaults to 0.
-  final int initialValue;
+  final double initialValue;
 
   /// The smallest value the counter can reach.
   /// Must be less than maximumValue.
   /// Restricted to [dart:core] int representation.
-  final int minimumValue;
+  final double minimumValue;
 
   /// The greatest value the counter can reach.
   /// Must be more than minimumValue.
   /// Restricted to [dart:core] int representation.
-  final int maximumValue;
+  final double maximumValue;
 
   /// The value added or subtracted when increasing or decreasing.
   /// Defaults to 1.
-  final int stepValue;
+  final double stepValue;
 
   /// Called whenever the value of the stepper changed.
-  final ValueChanged<int> onChanged;
+  final ValueChanged<double> onChanged;
 
   /// Locale for thousands separator.
   /// If the locale is not specified it will print in a basic format
@@ -122,9 +125,9 @@ class _Stepper2State extends State<GradualStepper>
   Animation _animation;
   StepperState _stepperState;
   NumberFormat _formatter;
-  int _value;
-  int _minimum;
-  int _maximum;
+  double _value;
+  double _minimum;
+  double _maximum;
 
   /// Timer used for auto repeat option.
   Timer timer;
@@ -148,7 +151,7 @@ class _Stepper2State extends State<GradualStepper>
     } else if (timerFireCount > 50) {
       return 2; // 0.05 sec * 2 = 0.1 sec
     } else {
-      return 10; // 0.05 sec * 10 = 0.5 sec
+      return 3; // 0.05 sec * 10 = 0.5 sec
     }
   }
 
@@ -163,7 +166,7 @@ class _Stepper2State extends State<GradualStepper>
     return (_formatter != null) ? _formatter.format(_value) : '$_value';
   }
 
-  set value(int newValue) {
+  set value(double newValue) {
     setState(() => _value = newValue);
 
     if (widget.onChanged != null) {
@@ -261,7 +264,7 @@ class _Stepper2State extends State<GradualStepper>
               child: SlideTransition(
                 position: _animation,
                 child: FractionallySizedBox(
-                  widthFactor: 2 / 5,
+                  widthFactor: 3 / 5,
                   child: Material(
                     color: widget.counterBackgroundColor,
                     borderRadius:
@@ -269,8 +272,8 @@ class _Stepper2State extends State<GradualStepper>
                     elevation: widget.counterElevation,
                     child: Center(
                       child: Text(
-                        _formattedValue,
-                        key: ValueKey<int>(_value),
+                        widget.displayValue,
+                        key: ValueKey<double>(_value),
                         style: widget.counterTextStyle,
                       ),
                     ),
@@ -286,7 +289,7 @@ class _Stepper2State extends State<GradualStepper>
 
   void _updateValue() {
     final oldValue = _value;
-    int newValue = oldValue;
+    double newValue = oldValue;
 
     if (_stepperState == StepperState.shouldIncrease) {
       if (_canIncrease) {
