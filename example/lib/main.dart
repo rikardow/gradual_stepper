@@ -9,14 +9,14 @@ class Currency {
   String iso;
   int subUnitToUnit;
   String symbol;
-  String disambiguateSymbol;
+  String? disambiguateSymbol;
 
   Currency(this.iso, this.subUnitToUnit, this.symbol, this.disambiguateSymbol);
 }
 
 class Money {
-  String iso;
-  int subUnits;
+  String? iso;
+  int? subUnits;
 
   Money(this.iso, this.subUnits);
 
@@ -41,8 +41,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State {
-  double _lowerValue = 0;
-  Money amount;
+  double? _lowerValue = 0;
+  late Money amount;
   double step = 0;
   double min = 0;
   double max = 0;
@@ -62,19 +62,19 @@ class MyHomePageState extends State {
   }
 
   void _step() {
-    step = 50 / currencies['BRL'].subUnitToUnit;
+    step = 50 / currencies['BRL']!.subUnitToUnit;
   }
 
   void _max() {
-    max = 5000 / currencies['BRL'].subUnitToUnit;
+    max = 5000 / currencies['BRL']!.subUnitToUnit;
   }
 
   void _min() {
-    min = 1000 / currencies['BRL'].subUnitToUnit;
+    min = 1000 / currencies['BRL']!.subUnitToUnit;
   }
 
   void _setValue() {
-    var value = _lowerValue * currencies['BRL'].subUnitToUnit;
+    var value = _lowerValue! * currencies['BRL']!.subUnitToUnit;
     amount = Money('BRL', value.toInt());
   }
 
@@ -86,7 +86,7 @@ class MyHomePageState extends State {
         child: Container(
           padding: const EdgeInsets.all(8.0),
           child: GradualStepper(
-            initialValue: _lowerValue,
+            initialValue: _lowerValue!,
             minimumValue: min,
             maximumValue: max,
             displayValue: amount.formatIso,
@@ -123,42 +123,42 @@ Map<String, Currency> currencies = {
 
 extension Format on Money {
   String get formatSymbol {
-    var currency = currencies[iso];
+    var currency = currencies[iso!]!;
     return units.toCurrencyString(trailingSymbol: ' ${currency.symbol}');
   }
 
   String get formatIso {
-    var currency = currencies[iso];
+    var currency = currencies[iso!]!;
     return units.toCurrencyString(trailingSymbol: ' ${currency.iso}');
   }
 
   double get units {
-    var currency = currencies[iso];
+    var currency = currencies[iso!];
     if (subUnits != null) {
-      return subUnits / currency.subUnitToUnit;
+      return subUnits! / currency!.subUnitToUnit;
     } else {
       return 0.0;
     }
   }
 
   String format() {
-    var currency = currencies[iso];
+    var currency = currencies[iso!]!;
     var format = NumberFormat.currency(
         decimalDigits: 0,
         symbol: currency.symbol,
         customPattern: "\$ #,##0.00");
-    return format.format(subUnits / currency.subUnitToUnit);
+    return format.format(subUnits! / currency.subUnitToUnit);
   }
 
   String formatWithIso() => "${format()} $iso".trim();
 
   int formatWithoutDecimals() {
-    var currency = currencies[iso];
-    return subUnits ~/ currency.subUnitToUnit;
+    var currency = currencies[iso!]!;
+    return subUnits! ~/ currency.subUnitToUnit;
   }
 
   int formatAddDecimals(int newValueSubUnits) {
-    var currency = currencies[iso];
+    var currency = currencies[iso!]!;
     return newValueSubUnits * currency.subUnitToUnit;
   }
 }
